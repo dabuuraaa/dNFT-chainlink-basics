@@ -35,6 +35,16 @@ contract TimeGrowStagedNFT is ERC721, ERC721URIStorage, Ownable {
         tokenStage[tokenId] = firstStage;
     }
 
+    function growNFT(uint targetId_) public {
+        Stages curStage = tokenStage[targetId_];
+        uint nextStage = uint(curStage) + 1;
+        require (nextStage <= uint(type(Stages).max), "over stage");
+        string memory metaFile = string.concat("metadata", Strings.toString(nextStage + 1), ".json");
+        _setTokenURI(targetId_, metaFile);
+        tokenStage[targetId_] = Stages(nextStage);
+        emit UpdateTokenURI(msg.sender, targetId_, metaFile);
+    }
+
     function _baseURI() internal pure override returns(string memory) {
         return "ipfs://bafybeichxrebqguwjqfyqurnwg5q7iarzi53p64gda74tgpg2uridnafva/";
     }
