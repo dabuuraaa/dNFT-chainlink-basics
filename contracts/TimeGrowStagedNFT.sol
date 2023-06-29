@@ -12,7 +12,32 @@ import "@openzeppelin/contracts@4.8.0/utils/Strings.sol";
 contract TimeGrowStagedNFT is ERC721, ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
 
+    Counters.Counter private _tokenIdCounter;
+
+    enum Stages { Baby, Child, Youth, Adult, Grandpa } 
+    
+    Stages public constant firstStage = Stages.Baby;
+
+    mapping( uint => Stages ) public tokenStage;
+
+    string public startFile = "metadata1.json";
+
+    event UpdateTokenURI(address indexed sender, uint256 indexed tokenId, string uri);
+
     constructor() ERC721("TimeGrowStagedNFT", "TGS") {}
+
+    function nftMint() public onlyOwner {
+        _tokenIdCounter.increment();
+        uint256 tokenId = _tokenIdCounter.current();
+        _safeMint(msg.sender, tokenId);
+        _setTokenURI(tokenId, startFile);
+        emit UpdateTokenURI(msg.sender, tokenId, startFile);
+        tokenStage[tokenId] = firstStage;
+    }
+
+    function _baseURI() internal pure override returns(string memory) {
+        return "ipfs://bafybeichxrebqguwjqfyqurnwg5q7iarzi53p64gda74tgpg2uridnafva/";
+    }
 
     /// @dev 以下は全てoverride 重複の整理
     function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
