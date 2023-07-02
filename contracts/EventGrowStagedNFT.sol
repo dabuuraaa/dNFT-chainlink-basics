@@ -41,6 +41,7 @@ contract EventGrowStagedNFT is ERC721, ERC721URIStorage, Ownable, AutomationComp
     function checkUpkeep(bytes calldata checkData) 
         external
         view
+        cannotExecute
         returns (bool upkeepNeeded, bytes memory performData) {
             uint targetId = abi.decode(checkData, (uint));
             require(_exists(targetId), "non existent tokenId.");
@@ -57,7 +58,7 @@ contract EventGrowStagedNFT is ERC721, ERC721URIStorage, Ownable, AutomationComp
                 performData = '';
             }
         }
-
+    
     function performUpkeep(bytes calldata performData) external {
         (uint targetId, uint nextStage) = abi.decode(performData, (uint, uint));
         require(_exists(targetId), "non existent tokenId.");
